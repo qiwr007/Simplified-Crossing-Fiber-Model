@@ -1,8 +1,11 @@
 import numpy as np
 
-def readFile(fileName, dtype, delimiter):
+# Use NumPy to read the matrix from file
+def readFile1(fileName, dtype, delimiter):
     matrix = np.loadtxt(fileName, dtype= dtype, delimiter= delimiter)
     return matrix
 
-
+def readFile(fileName):
+    matrix = np.loadtxt(fileName)
+    return matrix
 
