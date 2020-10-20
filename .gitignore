@@ -1,0 +1,2 @@
+# ignore venv (I guess it generates from Anaconda3)
+/venv/*
