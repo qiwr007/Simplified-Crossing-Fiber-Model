@@ -60,3 +60,6 @@ if __name__ == '__main__':
         # draw 5000 posterior samples
         trace = pm.sample(5000, step=step)
 
+    az.plot_trace(trace)
+    plt.show()
+

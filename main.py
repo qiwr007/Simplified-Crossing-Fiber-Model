@@ -29,7 +29,7 @@ if __name__ == '__main__':
     # bvecs_64_prime_last_col = np.matmul(bvecs_64_prime, np.array([0,0,1]))
 
     # three_index = bvecs_64_prime.view('i8,i8,i8')
-    three_index = bvecs_64_prime[bvecs_64_prime[:, -1].argsort()][-3:, ]
+    three_index = bvecs_64_prime[bvecs_64_prime[:, -1].argsort()][-1: -4 : -1]
 
     # acos(bvecs_64.prime[three_index,][1,] % * % bvecs_64.prime[three_index,][2,]) / pi * 180
     # acos(bvecs_64.prime[three_index,][1,] % * % bvecs_64.prime[three_index,][3,]) / pi * 180
