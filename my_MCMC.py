@@ -13,9 +13,11 @@ if __name__ == '__main__':
         # phi_prime_2 = pm.Uniform("phi_prime_2", lower=0, upper=np.pi)
         sigma_exp = pm.InverseGamma("sigma^-2", alpha=200, beta=1)
 
-        trace = pm.sample()
-        # step = pm.NUTS()
-        # trace = pm.sample(2000, tune=1000, init=None, step=step, cores=2)
+        # step1 = pm.HamiltonianMC([f1, phi_prime]);
+        # step2 = pm.NUTS([sigma_exp])
+        # trace = pm.sample(500, step=[step1, step2])
+        step = pm.NUTS() # based HMC
+        trace = pm.sample(2000, tune=1000, init=None, step=step, cores=2)
 
-    az.plot_trace(trace)
-    plt.show()
+    # az.plot_trace(trace)
+    # plt.show()
