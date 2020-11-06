@@ -42,20 +42,21 @@ def erf(x):
 def solve(si, bi): # data is several pairs of Si and bi
     s_max = np.amax(si)
     s_avg = np.average(si)
-    s0 = si[0]
+    s0 = si[0]  # the average of Si when bi = 0
 
     def equations(p):
         # list the set of the two equations, Eq(3) and Eq(4) in paper
         sum_f, d = p
-        return s0 * ((1 - sum_f) * exp(-bi * d) + sum_f * sqrt(pi) * erf(sqrt(bi * d)) / sqrt(bi * d)) - s_avg, s0 * ((1 - sum_f) * exp(-1 * bi * d) + sum_f) - s_max
+        return s0 * ((1 - sum_f) * exp(-bi * d) + sum_f * sqrt(pi) * erf(sqrt(bi * d)) / sqrt(bi * d)) - s_avg, \
+               s0 * ((1 - sum_f) * exp(-1 * bi * d) + sum_f) - s_max
 
     sum_f, d = fsolve(equations, (1, 1))
     return sum_f, d
 
 
 if __name__ == "__main__":
-    si = np.array([1, 2, 3])
-    bi = 1
+    si = np.array([1, 2, 3, 5, 1, 2, 10])
+    bi = 100
     aa, bb = solve(si, bi)
     print(aa)
     print(bb)
