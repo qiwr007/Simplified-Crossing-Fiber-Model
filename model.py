@@ -1,7 +1,9 @@
 import numpy as np
+
 from numpy import cos, sin, pi, exp, sqrt
 from scipy import integrate
 from scipy.optimize import fsolve
+from scipy.stats import norm
 import math
 
 
@@ -34,9 +36,13 @@ def error_function(x):
 
 
 def erf(x):
+    return 2 * norm.cdf(x * sqrt(2)) -1
+
+
+def erf2(x):
     f = lambda x: exp(-1 * x * x)
     v, err = integrate.quad(f, -x, x)
-    return v
+    return v / sqrt(pi)
 
 
 def solve(si, bi): # data is several pairs of Si and bi
@@ -55,8 +61,10 @@ def solve(si, bi): # data is several pairs of Si and bi
 
 
 if __name__ == "__main__":
-    si = np.array([1, 2, 3, 5, 1, 2, 10])
-    bi = 100
-    aa, bb = solve(si, bi)
-    print(aa)
-    print(bb)
+    print(erf(1.96))
+    print(erf2(1.96))
+    # si = np.array([1, 2, 3, 5, 1, 2, 10])
+    # bi = 100
+    # aa, bb = solve(si, bi)
+    # print(aa)
+    # print(bb)
