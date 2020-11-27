@@ -26,9 +26,9 @@ def AlignZ_Rot_mat (xx):
     theta = xx[0]
     phi = xx[1]
     temp = np.array([
-        [np.sin(theta) * np.cos(phi), np.sin(theta) * np.sin(phi), -np.cos(theta)],
-        [-np.sin(phi), np.cos(phi), 0],
-        [np.cos(theta) * np.cos(phi), np.cos(theta) * np.sin(phi), np.sin(theta)]
+        [sin(theta) * cos(phi), sin(theta) * sin(phi), -cos(theta)],
+        [-sin(phi), cos(phi), 0],
+        [cos(theta) * cos(phi), cos(theta) * sin(phi), sin(theta)]
     ])
     return temp
 
@@ -39,6 +39,15 @@ def log_post_2(params, y_value, b, est_sum_f, est_d):
     # log posterior for the model
     # (1)
     f1 = est_sum_f
+
+
+def rotation_matrix(theta, phi):
+    # create rotation matrix
+    ########## !!!!!!!!!!!! ###########
+    # here has different with R code and paper, I take the R code version
+    return np.array([[cos(theta) * cos(phi), -1 * sin(phi), sin(theta) * cos(phi)],
+                    [cos(theta) * sin(phi), cos(phi), sin(theta) * sin(phi)],
+                    [sin(theta), 0, -1 * cos(theta)]])
 
 
 def TwoFiber_Behrens_simplified_non_informative_simulation_sim(y_value, b, est_sum_f, est_d):
@@ -105,7 +114,7 @@ def erf(x):
 # b: diffusion weighting factor
 # d: diffusivity
 # noise.level: assummed noisy level (e.g. 5% of baseline intensity S0)
-def SmootherEstimator_sim(vol_fracs, phis, kappa=None,  b=1500, d=1/1500,  noise_level=0.05):
+def SmootherEstimator_sim(vol_fracs, phis, kappa=None,  b=1500, d=1/1500, noise_level=0.05, S0):
     # Nsim=1000; vol.fracs=c(0.3,0.3); phis=c(60, 120); kappa=10
     # Nsim: number of iterations
     # vol.fracs (vector): volume fraction for 2 fibers
@@ -126,24 +135,26 @@ def SmootherEstimator_sim(vol_fracs, phis, kappa=None,  b=1500, d=1/1500,  noise
     seed = np.random.choice(1000000, 1)[0]
     np.random.seed(seed)
 
-    # signal_data = BehrensSim()
+    signal_data = BehrensSim(S0=400, f=vol_fracs, bval=np.full((bvecs_64.shape[0]), b), bvecs=bvecs_64, d=d, theta=np.array([0, 0]), phi=phis)
+    # noise = np.random.normal(0, S0 * noise_level, int(bvecs_64.shape[0] / 2))
+    noise = norm.rvs(scale = S0 * noise_level, size=int(bvecs_64.shape[0] / 2) )
 
-
-def BehrensSim (s0, f, bval, bvecs, d, theta, phi):
+# Simulate mean S_i (non-noisy data) based on Behrens model
+def BehrensSim (S0, f, bval, bvecs, d, theta, phi):
     if len(f) != len(theta) or len(f) != len(phi):
-        print("Warning: parameters involving the number of fibers do not have the same length")
+        print("Warning: parameters involving the number of fibers do not have the same length!!")
         return
-
-    A_mat = np.array([[1,0,0],[0,0,0],[0,0,0]])
-    ball_comp = (1 - sum(f)) * np.exp(-1 * bval * d)
-
+    A_mat = np.array([[1,0,0],[0,0,0],[0,0,0]]) # A matrix
+    ball_comp = (1 - np.sum(f)) * np.exp(-1 * bval * d) # ball component
     stick_comp = np.zeros(len(bval))
-    for k in range(len(f)):
+    for k in range(len(f)): # compute stick component
         theta_k = theta[k] * pi /180
         phi_k = phi[k] * pi /180
+        R = rotation_matrix(theta=theta_k, phi=phi_k)
+        stick_comp += f[k] * exp(-1 * bval * d * np.diag(bvecs @ R @ A_mat @ R.transpose() @ bvecs.transpose()))
+    Si = S0 * (ball_comp + stick_comp)
+    return Si
 
-    si = s0 * (ball_comp + stick_comp)
-    return si
 
 
 if __name__ == '__main__':
