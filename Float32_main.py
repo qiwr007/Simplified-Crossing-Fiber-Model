@@ -292,15 +292,10 @@ def TwoFiber_Behrens_simplified_non_informative_simulation_sim(y_value, b, est_s
             log_posterior_proposed = log_posterior_2(np.append(prop_1, sigma_sq_1), y_value, b, est_sum_f, est_d)
             log_posterior_Omega = log_posterior_2(np.append(new_1, sigma_sq_1), y_value, b, est_sum_f, est_d)
             log_mhratio_1 = log_posterior_proposed - log_posterior_Omega
-            if log_mhratio_1 >= 0:
-                select_prob_1 = 1
-            else:
-                select_prob_1 = np.exp(log_mhratio_1)
-            # print(log_mhratio_1)
-            # select_prob_1 = min(1, np.exp(log_mhratio_1))  # if we code like this, it will cause a exp warning
+            select_prob_1 = min(1, np.exp(log_mhratio_1))  # Here should not be exp, Weiran guess
             # according to MCMC.pdf P4, log_posterior_proposed = log[ P(x')Q(x|x') ]
             # log_posterior_Omega = log[ P(x)Q(x'|x) ], is this right??
-            if random.random() < select_prob_1:  # accept the proposal and increment the acceptance counter
+            if random.random() < select_prob_1: #accept the proposal and increment the acceptance counter
                 if j == 1:
                     new_1[j] = prop_1[j]
                 else:
@@ -513,9 +508,3 @@ if __name__ == '__main__':
     phis = np.array([phi1, phi2])
 
     output = SmootherEstimator_sim(vol_fracs=vol_fracs, kappa=kappa_value, phis=phis, noise_level=0.05)
-
-
-
-
-
-
